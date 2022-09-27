@@ -1,9 +1,9 @@
 import os
 import sys
 import csv
-import datetime
 import datetime as dt
 from fpdf import FPDF, YPos, XPos
+from decimal import Decimal
 
 startTime = dt.datetime.now()
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,9 +61,9 @@ def create_pdf(records):
     total_value_of_sells: float = 0
     length_of_longest_comment: int = 0
     longest_comment: str = ''
-    first_trade_start_time: datetime = ''
-    last_trade_start_time: datetime = ''
-    firms_with_trade_volume: {str: float} = {}
+    first_trade_start_time: dt = ''
+    last_trade_start_time: dt = ''
+    firms_with_trade_volume: {str: Decimal} = {}
 
     trade_count: int = len(trade_records)
     for row in trade_records:
@@ -74,10 +74,14 @@ def create_pdf(records):
             first_trade_start_time = row[0]
         if row[0] > last_trade_start_time or last_trade_start_time == '':
             last_trade_start_time = row[0]
-        if row[2] in firms_with_trade_volume:
-            firms_with_trade_volume[row[2]] += float(row[3]) * float(row[4])
-        if row[2] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[2]] = float(row[3]) * float(row[4])
+        if row[5] in firms_with_trade_volume:
+            firms_with_trade_volume[row[5]] += Decimal(row[3]) * Decimal(row[4])
+        if row[5] not in firms_with_trade_volume:
+            firms_with_trade_volume[row[5]] = Decimal(row[3]) * Decimal(row[4])
+        if row[6] in firms_with_trade_volume:
+            firms_with_trade_volume[row[6]] += Decimal(row[3]) * Decimal(row[4])
+        if row[6] not in firms_with_trade_volume:
+            firms_with_trade_volume[row[6]] = Decimal(row[3]) * Decimal(row[4])
         if row[1] == 'B':
             total_value_of_buys += float((row[3])) * float((row[4]))
         elif row[1] == 'S':
@@ -89,20 +93,25 @@ def create_pdf(records):
             first_trade_start_time = row[1]
         if row[1] > last_trade_start_time or last_trade_start_time == '':
             last_trade_start_time = row[1]
-        if row[3] in firms_with_trade_volume:
-            firms_with_trade_volume[row[3]] += float(row[4]) * float(row[5])
-        if row[3] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[3]] = float(row[4]) * float(row[5])
+        if row[6] in firms_with_trade_volume:
+            firms_with_trade_volume[row[6]] += Decimal(row[4]) * Decimal(row[5])
+        if row[6] not in firms_with_trade_volume:
+            firms_with_trade_volume[row[6]] = Decimal(row[4]) * Decimal(row[5])
+        if row[7] in firms_with_trade_volume:
+            firms_with_trade_volume[row[7]] += Decimal(row[4]) * Decimal(row[5])
+        if row[7] not in firms_with_trade_volume:
+            firms_with_trade_volume[row[7]] = Decimal(row[4]) * Decimal(row[5])
         if row[2] == 'BUY_':
             total_value_of_buys += float((row[4])) * float((row[5]))
         elif row[2] == 'SELL':
             total_value_of_sells += float((row[4])) * float((row[5]))
 
     datetime_format = '%Y-%m-%d %H:%M:%S.%f'
-    first_trade_start_time: datetime = dt.datetime.strptime(first_trade_start_time, datetime_format)
-    last_trade_start_time: datetime = dt.datetime.strptime(last_trade_start_time, datetime_format)
+    first_trade_start_time: dt = dt.datetime.strptime(first_trade_start_time, datetime_format)
+    last_trade_start_time: dt = dt.datetime.strptime(last_trade_start_time, datetime_format)
     trade_interval = (last_trade_start_time - first_trade_start_time).total_seconds()
 
+    firms_with_trade_volume = {k: v for k, v in sorted(firms_with_trade_volume.items(), key=lambda item: item[1])}
     total_number_of_unique_firms = len(firms_with_trade_volume)
 
     pdf = FPDF('P', 'mm', 'A4')
