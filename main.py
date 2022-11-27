@@ -74,18 +74,19 @@ def create_pdf(records):
             first_trade_start_time = row[0]
         if row[0] > last_trade_start_time or last_trade_start_time == '':
             last_trade_start_time = row[0]
-        if row[5] in firms_with_trade_volume:
-            firms_with_trade_volume[row[5]] += Decimal(row[3]) * Decimal(row[4])
-        if row[5] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[5]] = Decimal(row[3]) * Decimal(row[4])
-        if row[6] in firms_with_trade_volume:
-            firms_with_trade_volume[row[6]] += Decimal(row[3]) * Decimal(row[4])
-        if row[6] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[6]] = Decimal(row[3]) * Decimal(row[4])
+
         if row[1] == 'B':
             total_value_of_buys += float((row[3])) * float((row[4]))
+            if row[2] in firms_with_trade_volume:
+                firms_with_trade_volume[row[2]] += Decimal(row[3]) * Decimal(row[4])
+            if row[2] not in firms_with_trade_volume:
+                firms_with_trade_volume[row[2]] = Decimal(row[3]) * Decimal(row[4])
         elif row[1] == 'S':
             total_value_of_sells += float((row[3])) * float((row[4]))
+            if row[2] in firms_with_trade_volume:
+                firms_with_trade_volume[row[2]] = + Decimal(row[3]) * Decimal(row[4])
+            if row[2] not in firms_with_trade_volume:
+                firms_with_trade_volume[row[2]] = Decimal(row[3]) * Decimal(row[4])
 
     ex_trade_count: int = len(ex_trade_records)
     for row in ex_trade_records:
@@ -93,14 +94,10 @@ def create_pdf(records):
             first_trade_start_time = row[1]
         if row[1] > last_trade_start_time or last_trade_start_time == '':
             last_trade_start_time = row[1]
-        if row[6] in firms_with_trade_volume:
-            firms_with_trade_volume[row[6]] += Decimal(row[4]) * Decimal(row[5])
-        if row[6] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[6]] = Decimal(row[4]) * Decimal(row[5])
-        if row[7] in firms_with_trade_volume:
-            firms_with_trade_volume[row[7]] += Decimal(row[4]) * Decimal(row[5])
-        if row[7] not in firms_with_trade_volume:
-            firms_with_trade_volume[row[7]] = Decimal(row[4]) * Decimal(row[5])
+        if row[3] in firms_with_trade_volume:
+            firms_with_trade_volume[row[3]] = + Decimal(row[4]) * Decimal(row[5])
+        if row[3] not in firms_with_trade_volume:
+            firms_with_trade_volume[row[3]] = Decimal(row[4]) * Decimal(row[5])
         if row[2] == 'BUY_':
             total_value_of_buys += float((row[4])) * float((row[5]))
         elif row[2] == 'SELL':
